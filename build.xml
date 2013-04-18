@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="smart_json_databsase" default="dist" basedir=".">
+    <description>
+        Smart JSON Database build file
+    </description>
+
+  <property name="src" location="src"/>
+  <property name="build" location="build"/>
+  <property name="dist"  location="dist"/>
+  <property file="build.properties"/>
+  <property name="version" value="BETA_1_4_0" />
+  
+
+
+  <target name="init" >
+    <mkdir dir="${build}"/>
+  	<copy tofile="${build}/LICENSE.txt" file="LICENSE.txt"/>
+  </target>
+
+  <target name="compile" depends="init"
+        description="compile the source " >
+    <javac srcdir="${src}" destdir="${build}">
+    <classpath>
+		<pathelement path="${classpath}"/>
+    	<!-- #Enter here the path to your android platform 7 --> 
+		<pathelement location="E:\android-sdk-windows\platforms\android-7\android.jar"/>
+    </classpath>
+    </javac>
+  </target>
+
+  <target name="dist" depends="compile"
+        description="generate the distribution" >
+    <mkdir dir="${dist}/lib"/>
+    <jar jarfile="${dist}/lib/smart_json_databsase-${version}.jar" basedir="${build}"/>
+  </target>
+
+  <target name="clean"
+        description="clean up" >
+    <delete dir="${build}"/>
+    <delete dir="${dist}"/>
+  </target>
+</project>
