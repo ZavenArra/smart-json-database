@@ -15,7 +15,7 @@
    limitations under the License.
    
    */
-package net.smart_json_databsase;
+package net.smart_json_database;
 
 public class InitJSONDatabaseExcepiton extends Exception {
 

@@ -15,7 +15,7 @@
    limitations under the License.
    
    */
-package net.smart_json_databsase;
+package net.smart_json_database;
 
 import android.database.sqlite.SQLiteDatabase;
 

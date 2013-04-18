@@ -15,7 +15,7 @@
    limitations under the License.
    
    */
-package net.smart_json_databsase.tools;
+package net.smart_json_database.tools;
 
 import android.util.Log;
 
