@@ -17,8 +17,8 @@
    */
 package net.smart_json_database;
 
-import net.smart_json_databsase.tools.Logger;
-import net.smart_json_databsase.tools.Util;
+import net.smart_json_database.tools.Logger;
+import net.smart_json_database.tools.Util;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;

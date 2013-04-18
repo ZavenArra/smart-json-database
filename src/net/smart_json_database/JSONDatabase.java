@@ -33,7 +33,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.xml.sax.SAXException;
 
-import net.smart_json_databsase.tools.Util;
+import net.smart_json_database.tools.Util;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.res.AssetManager;
@@ -230,8 +230,21 @@ public class JSONDatabase {
 	
 	public Collection<JSONEntity> fetchByFields(SearchFields search)
 	{
+		return fetchByFields(search, null);
+	}
+	
+	
+	public Collection<JSONEntity> fetchByFields(SearchFields search, Order order)
+	{
 		SQLiteDatabase db = dbHelper.getReadableDatabase();
-		return fetchByRawSQL(db,"SELECT * FROM " + TABLE_JSON_DATA + search.toString(),new String[]{});
+		ArrayList<JSONEntity> result; 
+		
+		if(order != null){
+			result = fetchByRawSQL(db,"SELECT * FROM " + TABLE_JSON_DATA + search.toString() + order.toString(),new String[]{});
+		} else {
+			result = fetchByRawSQL(db,"SELECT * FROM " + TABLE_JSON_DATA + search.toString(),new String[]{});
+		}
+		return result;
 	}
 	
 	public Collection<JSONEntity> fetchAllEntities()
