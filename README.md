@@ -13,13 +13,10 @@ You have to put this JSONDatabaseConfiguration.xml to your assets (if your Andro
 
 Example:
 
-<?xml version="1.0" encoding="UTF-8"?>
-
-<JSONDatabaseConfiguration> 
-
+        <?xml version="1.0" encoding="UTF-8"?>
+        <JSONDatabaseConfiguration> 
         <Database name="JSONDatabase.db" version="1" upgradeClass=""></Database>
-
-</JSONDatabaseConfiguration>
+        </JSONDatabaseConfiguration>
 
 Store and fetch entities
 ========================
@@ -27,31 +24,25 @@ Store and fetch entities
 Fetch By Id
 ===========
 
-try {
+        try {
 
-        database = JSONDatabase.GetDatabase(this);
-        
-        JSONEntity book1 = new JSONEntity("Book");
-        
-        book1.put("Title", "Book 1");
-        
-        book1.put("Price", 0.50);
-        
-        int id = database.store(book1);
+                database = JSONDatabase.GetDatabase(this);
+                JSONEntity book1 = new JSONEntity("Book");
+                book1.put("Title", "Book 1");
+                book1.put("Price", 0.50);
+                int id = database.store(book1);
+                JSONEntity book1_2 = database.fetchById(id);   
+                String title = book1_2.getString("Title");
 
-        JSONEntity book1_2 = database.fetchById(id);
-        
-        String title = book1_2.getString("Title");
+        } catch (InitJSONDatabaseExcepiton e) {
 
-} catch (InitJSONDatabaseExcepiton e) {
-
-e.printStackTrace();
+                e.printStackTrace();
                 
-} catch (JSONException e) {
+        } catch (JSONException e) {
 
-e.printStackTrace();
+                e.printStackTrace();
                         
-}
+        }
 
 Fetch By Field
 ==============
