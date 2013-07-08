@@ -166,7 +166,7 @@ public class JSONDatabase {
         		updateTagMap();
         		
         	}else{
-        		throw new InitJSONDatabaseExcepiton(CONFIG_XML + " is empty");
+        		throw new InitJSONDatabaseExcepiton(configXML + " is empty");
         	}
         }	
 	}
