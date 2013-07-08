@@ -13,10 +13,11 @@
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
-   
-   */
+
+ */
 package net.smart_json_database;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -29,10 +30,15 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.amci.nissan360.api.LoginUser;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 public class JSONEntity {
 
 	public static final String DEFAULT_TYPE = "jsonEntity";
-	
+
 	private JSONObject data;
 	private int uid;
 	private Date creationDate;
@@ -41,7 +47,7 @@ public class JSONEntity {
 	private TagRelation tags;
 	private HashMap<String, HasMany> hasManyRelations;
 	private HashMap<String, BelongsTo> belongsToRelations;
-	
+
 	public JSONEntity()
 	{
 		uid = -1;
@@ -53,7 +59,7 @@ public class JSONEntity {
 		hasManyRelations = new HashMap<String, HasMany>();
 		belongsToRelations = new HashMap<String, BelongsTo>();
 	}
-	
+
 	public JSONEntity(String type)
 	{
 		uid = -1;
@@ -65,7 +71,7 @@ public class JSONEntity {
 		hasManyRelations = new HashMap<String, HasMany>();
 		belongsToRelations = new HashMap<String, BelongsTo>();
 	}
-	
+
 	protected JSONEntity(JSONObject data, int uid, Date creationDate,
 			Date updateDate, TagRelation tags, String type) {
 		super();
@@ -78,27 +84,27 @@ public class JSONEntity {
 		hasManyRelations = new HashMap<String, HasMany>();
 		belongsToRelations = new HashMap<String, BelongsTo>();
 	}
-	
+
 	protected void setHasManyRelations(HashMap<String, HasMany> hasManyRelations)
 	{
 		this.hasManyRelations = hasManyRelations;
 	}
-	
+
 	protected void setBelongsToRelations(HashMap<String, BelongsTo> belongsToRelations)
 	{
 		this.belongsToRelations = belongsToRelations;
 	}
-	
+
 	protected  HashMap<String, HasMany> getHasManyRelations()
 	{
 		return hasManyRelations;
 	}
-	
+
 	protected HashMap<String, BelongsTo> getBelongsToRelations()
 	{
 		return belongsToRelations;
 	}
-	
+
 	/**
 	 * 
 	 * @param relName Name of the relation
@@ -113,7 +119,7 @@ public class JSONEntity {
 			return new ArrayList<Integer>();
 		}
 	}
-	
+
 	public void addIdToHasMany(String relName, Integer id)
 	{
 		if(hasManyRelations.containsKey(relName)){	
@@ -124,14 +130,14 @@ public class JSONEntity {
 			hasManyRelations.get(relName).add(id);
 		}
 	}
-	
+
 	public void removeIdFromHasMany(String relName, Integer id)
 	{
 		if(hasManyRelations.containsKey(relName)){	
 			hasManyRelations.get(relName).remove(id);
 		}
 	}
-	
+
 	public boolean containsHasManyRelation(String relName)
 	{
 		return hasManyRelations.containsKey(relName);
@@ -151,7 +157,7 @@ public class JSONEntity {
 			return new ArrayList<Integer>();
 		}
 	}
-	
+
 	public void addIdToBelongsTo(String relName, Integer id)
 	{
 		if(belongsToRelations.containsKey(relName)){	
@@ -162,20 +168,20 @@ public class JSONEntity {
 			belongsToRelations.get(relName).add(id);
 		}
 	}
-	
+
 	public void removeIdFromBelongsTo(String relName, Integer id)
 	{
 		if(belongsToRelations.containsKey(relName)){	
 			belongsToRelations.get(relName).remove(id);
 		}
 	}
-	
+
 	public boolean containsBelongsToRelation(String relName)
 	{
 		return belongsToRelations.containsKey(relName);
 	}	
-	
-	
+
+
 	public TagRelation getTags() {
 		return tags;
 	}
@@ -191,14 +197,14 @@ public class JSONEntity {
 	protected void setUid(int uid) {
 		this.uid = uid;
 	}
-	
-	
+
+
 
 	public String getType() {
-		
+
 		if(Util.IsNullOrEmpty(type))
 			return DEFAULT_TYPE;
-		
+
 		return type;
 	}
 
@@ -291,7 +297,7 @@ public class JSONEntity {
 		}
 		return data.put(key, value);
 	}
-	
+
 	public JSONObject put(String key, String value) throws JSONException {
 		if(value == null)
 		{
@@ -311,7 +317,7 @@ public class JSONEntity {
 	protected void setData(JSONObject data) {
 		this.data = data;
 	}
-	
+
 	@Override
 	public String toString() {
 		// TODO Auto-generated method stub
@@ -323,7 +329,7 @@ public class JSONEntity {
 			object.put("updateDate", updateDate.getTime());
 			object.put("data", data);
 			object.put("tags", new JSONArray(tags.getAll().toCollection()));
-			
+
 			ArrayList<JSONObject> relationsArray = new ArrayList<JSONObject>();
 			for(HasMany hasMany : hasManyRelations.values())
 			{
@@ -332,9 +338,9 @@ public class JSONEntity {
 				relObj.put(hasMany.getName(), new JSONArray(hasMany.getAll().toCollection()));
 				relationsArray.add(relObj);
 			}
-			
+
 			object.put("hasMany", new JSONArray(relationsArray));
-	
+
 			relationsArray = new ArrayList<JSONObject>();
 			for(BelongsTo belongsTo : belongsToRelations.values())
 			{
@@ -343,24 +349,36 @@ public class JSONEntity {
 				relObj.put(belongsTo.getName(), new JSONArray(belongsTo.getAll().toCollection()));
 				relationsArray.add(relObj);
 			}
-			
+
 			object.put("belongsTo", new JSONArray(relationsArray));
-			
+
 			return object.toString();
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			return null;
 		}
 	}
-	
+
+	/*
+	 * Either the string representation of a JSONEntity or the string representation of the data portion only
+	 */
 	public static JSONEntity ParseFromString(String s) throws JSONException
 	{
 		JSONObject object = new JSONObject(s);
-		JSONEntity jsonEntity = new JSONEntity(object.getString("type"));
-		jsonEntity.setUid(object.getInt("uid"));
-		jsonEntity.setCreationDate(new Date(object.getLong("creationDate")));
-		jsonEntity.setUpdateDate(new Date(object.getLong("updateDate")));
-		jsonEntity.setData(new JSONObject(object.getString("data")));
+
+		JSONEntity jsonEntity; 
+		if(object.has("type") && object.has("uid")){
+			jsonEntity = new JSONEntity(object.getString("type"));
+			jsonEntity.setUid(object.getInt("uid"));
+			jsonEntity.setCreationDate(new Date(object.getLong("creationDate")));
+			jsonEntity.setUpdateDate(new Date(object.getLong("updateDate")));
+			jsonEntity.setData(new JSONObject(object.getString("data")));
+		} else {
+			jsonEntity = new JSONEntity();
+			jsonEntity.setData(object);
+			return jsonEntity;
+		}
+		
 		if(object.has("tags"))
 		{
 			JSONArray jsonArray = object.getJSONArray("tags");
@@ -369,13 +387,13 @@ public class JSONEntity {
 				jsonEntity.tags.put(jsonArray.getString(i));
 			}
 		}
-		
+
 		if(object.has("hasMany"))
 		{
 			JSONArray jsonArray = object.getJSONArray("hasMany");
 			for(int i = 0; i < jsonArray.length(); i++)
 			{
-				
+
 				JSONObject relObj = jsonArray.getJSONObject(i);
 				String name = relObj.getString("name");
 				JSONArray relArray = relObj.getJSONArray(name);
@@ -389,7 +407,7 @@ public class JSONEntity {
 				}
 			}
 		}
-		
+
 		if(object.has("belongsTo"))
 		{
 			JSONArray jsonArray = object.getJSONArray("belongsTo");
@@ -408,8 +426,15 @@ public class JSONEntity {
 				}
 			}
 		}
-		
+
 		return jsonEntity;
 	}
-	
+
+	public Object asClass(Class<?> clazz) throws JsonParseException, JsonMappingException, IOException {
+		ObjectMapper mapper = new ObjectMapper();
+		String jsonString = getData().toString();
+		Object object = mapper.readValue(jsonString, clazz);
+		return object;
+	}
+
 }
