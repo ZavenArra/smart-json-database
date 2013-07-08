@@ -43,7 +43,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class JSONDatabase {
 
-	public static final String CONFIG_XML = "JSONDatabaseConfiguration.xml";
+	public static final String DEFAULT_CONFIGURATION_NAME = "JSONDatabaseConfiguration";
 	
 //	public static final String DB_NAME = "JSONDatabase.db"; 
 //	public static final int DB_VERSION = 1; 
@@ -78,7 +78,17 @@ public class JSONDatabase {
 	{
 		if(database == null)
 		{
-			database = new JSONDatabase(context);
+			database = new JSONDatabase(context, DEFAULT_CONFIGURATION_NAME);
+		}
+		
+		return database;
+	}
+	
+	public static JSONDatabase GetDatabase(Context context, String configurationName) throws InitJSONDatabaseExcepiton
+	{
+		if(database == null)
+		{
+			database = new JSONDatabase(context, configurationName);
 		}
 		
 		return database;
@@ -96,18 +106,19 @@ public class JSONDatabase {
 	
 	private static IUpgrade dbUpgrade;
 	
-	private JSONDatabase(Context context) throws InitJSONDatabaseExcepiton
+	private JSONDatabase(Context context, String configurationName) throws InitJSONDatabaseExcepiton
 	{
 		
 		AssetManager assetManager = context.getAssets();			
 		InputStream stream = null;
 		
+		String configXML = null;
 		try {
-        	
-            stream = assetManager.open(CONFIG_XML);
+        	configXML = configurationName + ".xml";
+            stream = assetManager.open(configurationName);
 
         } catch (IOException e) {
-        	throw new InitJSONDatabaseExcepiton("Could not load asset " + CONFIG_XML);
+        	throw new InitJSONDatabaseExcepiton("Could not load asset " + configXML);
         }finally {
         	if (stream != null) {
         		
