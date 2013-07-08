@@ -122,8 +122,6 @@ public class JSONDatabase {
         }finally {
         	if (stream != null) {
         		
-        		
-    			
         		SAXParserFactory factory = SAXParserFactory.newInstance();
     			XMLConfigHandler handler = new XMLConfigHandler();
               	SAXParser saxparser;
@@ -132,13 +130,13 @@ public class JSONDatabase {
 					saxparser.parse(stream, handler);
 				} catch (ParserConfigurationException e) {
 					// TODO Auto-generated catch block
-					throw new InitJSONDatabaseExcepiton("Parser-Error while reading the " + CONFIG_XML,e);
+					throw new InitJSONDatabaseExcepiton("Parser-Error while reading the " + configXML,e);
 				} catch (SAXException e) {
 					// TODO Auto-generated catch block
-					throw new InitJSONDatabaseExcepiton("SAX-Error while reading the " + CONFIG_XML,e);
+					throw new InitJSONDatabaseExcepiton("SAX-Error while reading the " + configXML,e);
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
-					throw new InitJSONDatabaseExcepiton("IO-Error while reading the " + CONFIG_XML,e);
+					throw new InitJSONDatabaseExcepiton("IO-Error while reading the " + configXML,e);
 				}
  	
               	mDbName = handler.getDbName();
