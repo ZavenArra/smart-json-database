@@ -497,6 +497,27 @@ public class JSONDatabase {
 		return returnValue;
 	}
 	
+	public boolean deleteAll(){
+		SQLiteDatabase db = dbHelper.getWritableDatabase();
+		boolean returnValue = false;
+		try{
+			db.beginTransaction();
+			db.delete(TABLE_REL_JSON_DATA_JSON_DATA, "", null);
+			db.delete(TABLE_REL_JSON_DATA_JSON_DATA, "", null);
+			db.delete(TABLE_REL_TAG_JSON_DATA, "", null);
+			db.delete(TABLE_JSON_DATA, "", null);
+			db.setTransactionSuccessful();
+			returnValue = true;
+		}catch(Exception e)
+		{
+				returnValue = false;
+		}finally{
+				db.endTransaction();
+				db.close();
+		}
+		return returnValue;
+	}
+	
 	public Collection<String> getTagNames()
 	{
 		return tags.keySet();
