@@ -26,14 +26,16 @@ import java.util.Iterator;
 
 import net.smart_json_database.tools.Util;
 
-import org.codehaus.jackson.map.JsonMappingException;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.amci.nissan360.api.LoginUser;
-import com.fasterxml.jackson.core.JsonParseException;
+
+import org.codehaus.jackson.JsonProcessingException;
+import org.codehaus.jackson.JsonParseException;
+import org.codehaus.jackson.map.JsonMappingException;
+import org.codehaus.jackson.map.ObjectMapper;
 
 public class JSONEntity {
 
