@@ -75,26 +75,15 @@ public class JSONDatabase {
 	private static final String Fetch_BY_ID_SCRIPTE = "SELECT * FROM " + TABLE_JSON_DATA + " WHERE json_uid = ?";
 	private static final String Fetch_BY_TAG_SCRIPTE = "SELECT * FROM "+TABLE_JSON_DATA+", "+TABLE_REL_TAG_JSON_DATA+", "+TABLE_TAG+" WHERE name = ? AND from_id = tag_uid AND to_id = json_uid";
 
-	private static JSONDatabase database = null;
 
 	public static JSONDatabase GetDatabase(Context context) throws InitJSONDatabaseExcepiton
 	{
-		if(database == null)
-		{
-			database = new JSONDatabase(context, DEFAULT_CONFIGURATION_NAME);
-		}
-
-		return database;
+		return new JSONDatabase(context, DEFAULT_CONFIGURATION_NAME);
 	}
 
 	public static JSONDatabase GetDatabase(Context context, String configurationName) throws InitJSONDatabaseExcepiton
 	{
-		if(database == null)
-		{
-			database = new JSONDatabase(context, configurationName);
-		}
-
-		return database;
+		return new JSONDatabase(context, configurationName);
 	}
 
 	private DBHelper dbHelper = null;
