@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -222,20 +223,20 @@ public class JSONDatabase {
 		return null;
 	}
 
-	public Collection<JSONEntity> fetchByTag(String tag)
+	public List<JSONEntity> fetchByTag(String tag)
 	{
 
 		SQLiteDatabase db = dbHelper.getReadableDatabase();
 		return fetchByRawSQL(db,Fetch_BY_TAG_SCRIPTE,new String[]{tag});
 	}
 
-	public Collection<JSONEntity> fetchByFields(SearchFields search)
+	public List<JSONEntity> fetchByFields(SearchFields search)
 	{
 		return fetchByFields(search, null);
 	}
 
 
-	public Collection<JSONEntity> fetchByFields(SearchFields search, Order order)
+	public List<JSONEntity> fetchByFields(SearchFields search, Order order)
 	{
 		SQLiteDatabase db = dbHelper.getReadableDatabase();
 		ArrayList<JSONEntity> result; 
@@ -248,13 +249,13 @@ public class JSONDatabase {
 		return result;
 	}
 
-	public Collection<JSONEntity> fetchAllEntities()
+	public List<JSONEntity> fetchAllEntities()
 	{
 		SQLiteDatabase db = dbHelper.getReadableDatabase();
 		return fetchByRawSQL(db,"SELECT * FROM " + TABLE_JSON_DATA,new String[]{});
 	}
 
-	public Collection<JSONEntity> fetchByType(String type)
+	public List<JSONEntity> fetchByType(String type)
 	{
 		if(Util.IsNullOrEmpty(type))
 			return new ArrayList<JSONEntity>();
@@ -263,7 +264,7 @@ public class JSONDatabase {
 		return fetchByRawSQL(db,"SELECT * FROM " + TABLE_JSON_DATA + " WHERE type = '" + type + "'",new String[]{});
 	}
 
-	public Collection<JSONEntity> fetchManyByIds(Collection<Integer> ids)
+	public List<JSONEntity> fetchManyByIds(Collection<Integer> ids)
 	{
 		if(ids == null)
 			return new ArrayList<JSONEntity>();
