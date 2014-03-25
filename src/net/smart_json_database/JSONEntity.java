@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 
 import net.smart_json_database.tools.Util;
 
@@ -34,6 +35,8 @@ import org.codehaus.jackson.JsonProcessingException;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
+
+import com.terrapages.mypointsofinterest.model.PoiLayer;
 
 public class JSONEntity {
 
@@ -435,6 +438,16 @@ public class JSONEntity {
 		String jsonString = getData().toString();
 		Object object = mapper.readValue(jsonString, clazz);
 		return object;
+	}
+
+	@SuppressWarnings("unchecked")
+	public static <T> List<T> entityListAsObjectList(
+			List<JSONEntity> entities, Class<T> klazz) throws JsonParseException, JsonMappingException, IOException {
+		List<T> objectsList = new ArrayList<T>();
+		for(Iterator<JSONEntity> i = entities.iterator(); i.hasNext(); ){
+			objectsList.add((T) i.next().asClass(klazz));
+		}
+		return objectsList;
 	}
 
 }

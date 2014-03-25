@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.TreeMap;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -74,7 +75,7 @@ public class JSONDatabase {
 			" (from_id integer, to_id integer, rel_name varchar(100));";
 
 	private static final String Fetch_BY_ID_SCRIPTE = "SELECT * FROM " + TABLE_JSON_DATA + " WHERE json_uid = ?";
-	private static final String Fetch_BY_TAG_SCRIPTE = "SELECT * FROM "+TABLE_JSON_DATA+", "+TABLE_REL_TAG_JSON_DATA+", "+TABLE_TAG+" WHERE name = ? AND from_id = tag_uid AND to_id = json_uid";
+	private static final String FETCH_BY_TAG_SCRIPT = "SELECT * FROM "+TABLE_JSON_DATA+", "+TABLE_REL_TAG_JSON_DATA+", "+TABLE_TAG+" WHERE name = ? AND from_id = tag_uid AND to_id = json_uid";
 
 
 	public static JSONDatabase GetDatabase(Context context) throws InitJSONDatabaseExcepiton
@@ -227,7 +228,7 @@ public class JSONDatabase {
 	{
 
 		SQLiteDatabase db = dbHelper.getReadableDatabase();
-		return fetchByRawSQL(db,Fetch_BY_TAG_SCRIPTE,new String[]{tag});
+		return fetchByRawSQL(db,FETCH_BY_TAG_SCRIPT,new String[]{tag});
 	}
 
 	public List<JSONEntity> fetchByFields(SearchFields search)
@@ -242,7 +243,7 @@ public class JSONDatabase {
 		ArrayList<JSONEntity> result; 
 
 		if(order != null){
-			result = fetchByRawSQL(db,"SELECT * FROM " + TABLE_JSON_DATA + search.toString() + order.toString(),new String[]{});
+			result = fetchByRawSQL(db,"SELECT * FROM " + TABLE_JSON_DATA + search.toString(),new String[]{}, order);
 		} else {
 			result = fetchByRawSQL(db,"SELECT * FROM " + TABLE_JSON_DATA + search.toString(),new String[]{});
 		}
@@ -524,9 +525,26 @@ public class JSONDatabase {
 		return tags.keySet();
 	}
 
-	private ArrayList<JSONEntity> fetchByRawSQL(SQLiteDatabase db, String sql, String[] params)
+	private ArrayList<JSONEntity> fetchByRawSQL(SQLiteDatabase db, String sql, String[] params){
+		return fetchByRawSQL(db, sql, params);
+	}
+
+	
+	private ArrayList<JSONEntity> fetchByRawSQL(SQLiteDatabase db, String sql, String[] params, Order order)
 	{
-		ArrayList<JSONEntity> list = new ArrayList<JSONEntity>();
+		
+		ArrayList<JSONEntity> list = null;
+		TreeMap<String, JSONEntity> map = null;
+		if(order != null && order.sortDataField()){
+			map = new TreeMap<String, JSONEntity>();
+		} else {
+			list = new ArrayList<JSONEntity>();
+		}
+		
+		if(order != null && order.sortDatabaseField()){
+			sql += order.sql();
+		}
+		
 		Cursor c = db.rawQuery(sql, params);
 		if(c.getCount() > 0)
 		{
@@ -544,7 +562,11 @@ public class JSONDatabase {
 					entity.setUpdateDate(Util.ParseDateFromString(c.getString(col_updateDate)));
 					entity.setData(new JSONObject(c.getString(col_data)));
 					entity.setType(c.getString(col_type));
-					list.add(entity);
+					if(list != null){
+						list.add(entity);
+					} else {
+						map.put(entity.getString(order.collation()), entity);
+					}
 				} catch (JSONException e) {
 					// TODO Auto-generated catch block
 					//e.printStackTrace();
@@ -552,6 +574,9 @@ public class JSONDatabase {
 			}while(c.moveToNext());
 		}
 		c.close();
+		if(map != null){
+			list = new ArrayList<JSONEntity>(map.values());
+		}
 		for(JSONEntity entity : list)
 		{
 			getTagsForJSONEntity(entity,db);
