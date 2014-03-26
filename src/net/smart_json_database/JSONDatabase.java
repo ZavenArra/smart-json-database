@@ -256,7 +256,7 @@ public class JSONDatabase {
 	{
 		return fetchByType(type, null);
 	}
-	
+
 
 	public List<JSONEntity> fetchByType(String type, Order order) {
 		if(Util.IsNullOrEmpty(type))
@@ -341,36 +341,37 @@ public class JSONDatabase {
 				{
 					throw new Exception("could not relate entity with tags");
 				}
-
-
-				for(HasMany hasMany : entity.getHasManyRelations().values())
-				{
-					//					for(Integer id : hasMany.getToRemove())
-					//					{
-					//						deleteRelation(hasMany.getName(), uid, id, db);
-					//					}
-
-					for(Integer id : hasMany.getToAdd())
-					{
-						insertRelation(hasMany.getName(), uid, id, db);
-					}
-				}
-
-
-				for(BelongsTo belongsTo : entity.getBelongsToRelations().values())
-				{
-					//					for(Integer id : belongsTo.getToRemove())
-					//					{
-					//						deleteRelation(belongsTo.getName(), id ,uid,  db);
-					//					}
-
-					for(Integer id : belongsTo.getToAdd())
-					{
-						insertRelation(belongsTo.getName(),id, uid, db);
-					}
-				}
-
 			}
+
+
+			for(HasMany hasMany : entity.getHasManyRelations().values())
+			{
+				//					for(Integer id : hasMany.getToRemove())
+				//					{
+				//						deleteRelation(hasMany.getName(), uid, id, db);
+				//					}
+
+				for(Integer id : hasMany.getToAdd())
+				{
+					insertRelation(hasMany.getName(), uid, id, db);
+				}
+			}
+
+
+			for(BelongsTo belongsTo : entity.getBelongsToRelations().values())
+			{
+				//					for(Integer id : belongsTo.getToRemove())
+				//					{
+				//						deleteRelation(belongsTo.getName(), id ,uid,  db);
+				//					}
+
+				for(Integer id : belongsTo.getToAdd())
+				{
+					insertRelation(belongsTo.getName(),id, uid, db);
+				}
+			}
+
+
 			db.setTransactionSuccessful();
 			notifyListenersOnEntityChange(returnValue, IDatabaseChangeListener.CHANGETYPE_INSERT);
 		}catch(Exception e)
@@ -530,10 +531,10 @@ public class JSONDatabase {
 		return fetchByRawSQL(db, sql, params, null);
 	}
 
-	
+
 	private ArrayList<JSONEntity> fetchByRawSQL(SQLiteDatabase db, String sql, String[] params, Order order)
 	{
-		
+
 		ArrayList<JSONEntity> list = null;
 		TreeMap<String, JSONEntity> map = null;
 		if(order != null && order.sortDataField()){
@@ -541,11 +542,11 @@ public class JSONDatabase {
 		} else {
 			list = new ArrayList<JSONEntity>();
 		}
-		
+
 		if(order != null && order.sortDatabaseField()){
 			sql += order.sql();
 		}
-		
+
 		Cursor c = db.rawQuery(sql, params);
 		if(c.getCount() > 0)
 		{

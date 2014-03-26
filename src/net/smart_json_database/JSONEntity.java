@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import net.smart_json_database.integration.SmartJsonDatabaseObject;
 import net.smart_json_database.tools.Util;
 
 import org.json.JSONArray;
@@ -435,16 +436,16 @@ public class JSONEntity {
 	
 	// Use the type field to get the class to map to
 	public Object asClass() throws JsonParseException, JsonMappingException, IOException, ClassNotFoundException {
-		ObjectMapper mapper = new ObjectMapper();
-		String jsonString = getData().toString();
-		Object object = mapper.readValue(jsonString, Class.forName(getType()));
-		return object;
+		return this.asClass(Class.forName(getType()));
 	}
 
 	public Object asClass(Class<?> clazz) throws JsonParseException, JsonMappingException, IOException {
 		ObjectMapper mapper = new ObjectMapper();
 		String jsonString = getData().toString();
 		Object object = mapper.readValue(jsonString, clazz);
+		if(object instanceof SmartJsonDatabaseObject){
+			((SmartJsonDatabaseObject) object).setUid(getUid());
+		}
 		return object;
 	}
 
