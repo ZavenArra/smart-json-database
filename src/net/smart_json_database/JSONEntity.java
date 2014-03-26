@@ -432,6 +432,14 @@ public class JSONEntity {
 
 		return jsonEntity;
 	}
+	
+	// Use the type field to get the class to map to
+	public Object asClass() throws JsonParseException, JsonMappingException, IOException, ClassNotFoundException {
+		ObjectMapper mapper = new ObjectMapper();
+		String jsonString = getData().toString();
+		Object object = mapper.readValue(jsonString, Class.forName(getType()));
+		return object;
+	}
 
 	public Object asClass(Class<?> clazz) throws JsonParseException, JsonMappingException, IOException {
 		ObjectMapper mapper = new ObjectMapper();

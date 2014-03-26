@@ -59,7 +59,7 @@ public class JSONDatabase {
 	public static final String TABLE_REL_TAG_JSON_DATA = "Rel_Tag_JsonData";
 	public static final String TABLE_REL_JSON_DATA_JSON_DATA = "Rel_JsonData_JsonData";
 
-	private static final String TABLE_Meta_CreateSkript = "CREATE TABLE IF NOT EXISTS " +TABLE_Meta+
+	private static final String TABLE_META_CREATE_SCRIPT = "CREATE TABLE IF NOT EXISTS " +TABLE_Meta+
 			" (key varchar(100), value varchar(255));";
 
 	private static final String TAG_DB_CREATE_SCRIPTE = "CREATE TABLE IF NOT EXISTS " + TABLE_TAG +
@@ -74,7 +74,7 @@ public class JSONDatabase {
 	private static final String REL_JSON_DATA_JSON_DATA_DB_CREATE_SCRIPTE = "CREATE TABLE IF NOT EXISTS " +TABLE_REL_JSON_DATA_JSON_DATA+
 			" (from_id integer, to_id integer, rel_name varchar(100));";
 
-	private static final String Fetch_BY_ID_SCRIPTE = "SELECT * FROM " + TABLE_JSON_DATA + " WHERE json_uid = ?";
+	private static final String FETCH_BY_ID_SCRIPT = "SELECT * FROM " + TABLE_JSON_DATA + " WHERE json_uid = ?";
 	private static final String FETCH_BY_TAG_SCRIPT = "SELECT * FROM "+TABLE_JSON_DATA+", "+TABLE_REL_TAG_JSON_DATA+", "+TABLE_TAG+" WHERE name = ? AND from_id = tag_uid AND to_id = json_uid";
 
 
@@ -215,7 +215,7 @@ public class JSONDatabase {
 	{
 
 		SQLiteDatabase db = dbHelper.getReadableDatabase();
-		ArrayList<JSONEntity> list = fetchByRawSQL(db,Fetch_BY_ID_SCRIPTE,new String[]{""+id});
+		ArrayList<JSONEntity> list = fetchByRawSQL(db,FETCH_BY_ID_SCRIPT,new String[]{""+id});
 		db.close();
 		if(list.size() > 0)
 		{
@@ -242,11 +242,7 @@ public class JSONDatabase {
 		SQLiteDatabase db = dbHelper.getReadableDatabase();
 		ArrayList<JSONEntity> result; 
 
-		if(order != null){
-			result = fetchByRawSQL(db,"SELECT * FROM " + TABLE_JSON_DATA + search.toString(),new String[]{}, order);
-		} else {
-			result = fetchByRawSQL(db,"SELECT * FROM " + TABLE_JSON_DATA + search.toString(),new String[]{});
-		}
+		result = fetchByRawSQL(db,"SELECT * FROM " + TABLE_JSON_DATA + search.toString(),new String[]{}, order);
 		return result;
 	}
 
@@ -258,11 +254,16 @@ public class JSONDatabase {
 
 	public List<JSONEntity> fetchByType(String type)
 	{
+		return fetchByType(type, null);
+	}
+	
+
+	public List<JSONEntity> fetchByType(String type, Order order) {
 		if(Util.IsNullOrEmpty(type))
 			return new ArrayList<JSONEntity>();
 
 		SQLiteDatabase db = dbHelper.getReadableDatabase();
-		return fetchByRawSQL(db,"SELECT * FROM " + TABLE_JSON_DATA + " WHERE type = '" + type + "'",new String[]{});
+		return fetchByRawSQL(db,"SELECT * FROM " + TABLE_JSON_DATA + " WHERE type = '" + type + "'",new String[]{}, order);
 	}
 
 	public List<JSONEntity> fetchManyByIds(Collection<Integer> ids)
@@ -526,7 +527,7 @@ public class JSONDatabase {
 	}
 
 	private ArrayList<JSONEntity> fetchByRawSQL(SQLiteDatabase db, String sql, String[] params){
-		return fetchByRawSQL(db, sql, params);
+		return fetchByRawSQL(db, sql, params, null);
 	}
 
 	
@@ -929,7 +930,7 @@ public class JSONDatabase {
 		@Override
 		public void onCreate(SQLiteDatabase db) {
 			// TODO Auto-generated method stub
-			db.execSQL(TABLE_Meta_CreateSkript);
+			db.execSQL(TABLE_META_CREATE_SCRIPT);
 			db.execSQL(TAG_DB_CREATE_SCRIPTE);
 			db.execSQL(JSONDATA_DB_CREATE_SCRIPTE);
 			db.execSQL(Rel_TAG_JSONDATA_DB_CREATE_SCRIPTE);
@@ -966,4 +967,6 @@ public class JSONDatabase {
 		}
 
 	}
+
+
 }
