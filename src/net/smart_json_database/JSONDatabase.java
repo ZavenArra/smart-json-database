@@ -62,16 +62,16 @@ public class JSONDatabase {
 	private static final String TABLE_META_CREATE_SCRIPT = "CREATE TABLE IF NOT EXISTS " +TABLE_Meta+
 			" (key varchar(100), value varchar(255));";
 
-	private static final String TAG_DB_CREATE_SCRIPTE = "CREATE TABLE IF NOT EXISTS " + TABLE_TAG +
+	private static final String TAG_DB_CREATE_SCRIPT = "CREATE TABLE IF NOT EXISTS " + TABLE_TAG +
 			" (tag_uid integer primary key autoincrement, name varchar(100));";
 
-	private static final String JSONDATA_DB_CREATE_SCRIPTE = "CREATE TABLE IF NOT EXISTS " +TABLE_JSON_DATA+
+	private static final String JSONDATA_DB_CREATE_SCRIPT = "CREATE TABLE IF NOT EXISTS " +TABLE_JSON_DATA+
 			" (json_uid integer primary key autoincrement, createDate date, updateDate date, type varchar(100) DEFAULT " + JSONEntity.DEFAULT_TYPE + ", data text);";
 
-	private static final String Rel_TAG_JSONDATA_DB_CREATE_SCRIPTE = "CREATE TABLE IF NOT EXISTS " +TABLE_REL_TAG_JSON_DATA+
+	private static final String REL_TAG_JSONDATA_DB_CREATE_SCRIPT = "CREATE TABLE IF NOT EXISTS " +TABLE_REL_TAG_JSON_DATA+
 			" (from_id integer, to_id integer);";
 
-	private static final String REL_JSON_DATA_JSON_DATA_DB_CREATE_SCRIPTE = "CREATE TABLE IF NOT EXISTS " +TABLE_REL_JSON_DATA_JSON_DATA+
+	private static final String REL_JSON_DATA_JSON_DATA_DB_CREATE_SCRIPT = "CREATE TABLE IF NOT EXISTS " +TABLE_REL_JSON_DATA_JSON_DATA+
 			" (from_id integer, to_id integer, rel_name varchar(100));";
 
 	private static final String FETCH_BY_ID_SCRIPT = "SELECT * FROM " + TABLE_JSON_DATA + " WHERE json_uid = ?";
@@ -932,10 +932,10 @@ public class JSONDatabase {
 		public void onCreate(SQLiteDatabase db) {
 			// TODO Auto-generated method stub
 			db.execSQL(TABLE_META_CREATE_SCRIPT);
-			db.execSQL(TAG_DB_CREATE_SCRIPTE);
-			db.execSQL(JSONDATA_DB_CREATE_SCRIPTE);
-			db.execSQL(Rel_TAG_JSONDATA_DB_CREATE_SCRIPTE);
-			db.execSQL(REL_JSON_DATA_JSON_DATA_DB_CREATE_SCRIPTE);
+			db.execSQL(TAG_DB_CREATE_SCRIPT);
+			db.execSQL(JSONDATA_DB_CREATE_SCRIPT);
+			db.execSQL(REL_TAG_JSONDATA_DB_CREATE_SCRIPT);
+			db.execSQL(REL_JSON_DATA_JSON_DATA_DB_CREATE_SCRIPT);
 			//Check is firsttime
 
 			Cursor c = db.rawQuery("SELECT key FROM " + TABLE_Meta, new String[0]);
