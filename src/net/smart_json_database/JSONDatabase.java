@@ -77,7 +77,10 @@ public class JSONDatabase {
 	private static final String FETCH_BY_ID_SCRIPT = "SELECT * FROM " + TABLE_JSON_DATA + " WHERE json_uid = ?";
 	private static final String FETCH_BY_TAG_SCRIPT = "SELECT * FROM "+TABLE_JSON_DATA+", "+TABLE_REL_TAG_JSON_DATA+", "+TABLE_TAG+" WHERE name = ? AND from_id = tag_uid AND to_id = json_uid";
 
+	private static final String CREATE_REL_FROM_INDEX_SCRIPT = "CREATE INDEX Rel_JsonData_JsonData_From_Id_Index ON Rel_JsonData_JsonData ( from_id )";
+	private static final String CREATE_REL_TO_INDEX_SCRIPT = "CREATE INDEX Rel_JsonData_JsonData_To_Id_Index ON Rel_JsonData_JsonData ( to_id )";
 
+	
 	public static JSONDatabase GetDatabase(Context context) throws InitJSONDatabaseExcepiton
 	{
 		return new JSONDatabase(context, DEFAULT_CONFIGURATION_NAME);
@@ -925,18 +928,17 @@ public class JSONDatabase {
 		public DBHelper(Context context, String name,
 				int version) {
 			super(context, name, null, version);
-			// TODO Auto-generated constructor stub
 		}
 
 		@Override
 		public void onCreate(SQLiteDatabase db) {
-			// TODO Auto-generated method stub
 			db.execSQL(TABLE_META_CREATE_SCRIPT);
 			db.execSQL(TAG_DB_CREATE_SCRIPT);
 			db.execSQL(JSONDATA_DB_CREATE_SCRIPT);
 			db.execSQL(REL_TAG_JSONDATA_DB_CREATE_SCRIPT);
 			db.execSQL(REL_JSON_DATA_JSON_DATA_DB_CREATE_SCRIPT);
-			//Check is firsttime
+			db.execSQL(CREATE_REL_FROM_INDEX_SCRIPT);
+			db.execSQL(CREATE_REL_TO_INDEX_SCRIPT);
 
 			Cursor c = db.rawQuery("SELECT key FROM " + TABLE_Meta, new String[0]);
 
@@ -960,7 +962,6 @@ public class JSONDatabase {
 
 		@Override
 		public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-			// TODO Auto-generated method stub
 			if(dbUpgrade != null)
 			{
 				dbUpgrade.doUpgrade(db, oldVersion, newVersion);
