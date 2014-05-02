@@ -179,6 +179,16 @@ public class JSONEntity {
 			belongsToRelations.get(relName).remove(id);
 		}
 	}
+	
+	public void clearBelongsTo(String relName){
+		BelongsTo belongsTo = belongsToRelations.get(relName);
+		if(belongsTo != null){
+			Object[] relations = belongsTo.getAll().toArray();
+			for(int i=0; i<relations.length; i++)
+				belongsTo.remove( (Integer) relations[i]);
+		}
+	}
+
 
 	public boolean containsBelongsToRelation(String relName)
 	{
