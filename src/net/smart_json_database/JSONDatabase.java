@@ -567,6 +567,9 @@ public class JSONDatabase {
 					entity.setUpdateDate(Util.ParseDateFromString(c.getString(col_updateDate)));
 					entity.setData(new JSONObject(c.getString(col_data)));
 					entity.setType(c.getString(col_type));
+					getTagsForJSONEntity(entity,db);
+					getHasManyRelationsForJSONEntity(entity,db);
+					getBelongsToRelationsForJSONEntity(entity,db);
 					if(list != null){
 						list.add(entity);
 					} else {
@@ -581,12 +584,6 @@ public class JSONDatabase {
 		c.close();
 		if(map != null){
 			list = new ArrayList<JSONEntity>(map.values());
-		}
-		for(JSONEntity entity : list)
-		{
-			getTagsForJSONEntity(entity,db);
-			getHasManyRelationsForJSONEntity(entity,db);
-			getBelongsToRelationsForJSONEntity(entity,db);
 		}
 		return list;
 	}
