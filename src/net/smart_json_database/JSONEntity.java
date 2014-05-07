@@ -37,6 +37,8 @@ import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 
+import android.database.Cursor;
+
 import com.terrapages.mypointsofinterest.model.PoiLayer;
 
 public class JSONEntity {
@@ -179,7 +181,7 @@ public class JSONEntity {
 			belongsToRelations.get(relName).remove(id);
 		}
 	}
-	
+
 	public void clearBelongsTo(String relName){
 		BelongsTo belongsTo = belongsToRelations.get(relName);
 		if(belongsTo != null){
@@ -392,7 +394,7 @@ public class JSONEntity {
 			jsonEntity.setData(object);
 			return jsonEntity;
 		}
-		
+
 		if(object.has("tags"))
 		{
 			JSONArray jsonArray = object.getJSONArray("tags");
@@ -443,7 +445,7 @@ public class JSONEntity {
 
 		return jsonEntity;
 	}
-	
+
 	// Use the type field to get the class to map to
 	public Object asClass() throws JsonParseException, JsonMappingException, IOException, ClassNotFoundException {
 		return this.asClass(Class.forName(getType()));
@@ -467,6 +469,21 @@ public class JSONEntity {
 			objectsList.add((T) i.next().asClass(klazz));
 		}
 		return objectsList;
+	}
+
+	public static JSONEntity loadFromCursor(Cursor c) throws JSONException {
+		int col_id = c.getColumnIndex("json_uid");
+		int col_createDate = c.getColumnIndex("createDate");
+		int col_updateDate = c.getColumnIndex("updateDate");
+		int col_data = c.getColumnIndex("data");
+		int col_type = c.getColumnIndex("type");
+		JSONEntity entity = new JSONEntity();
+		entity.setUid(c.getInt(col_id));
+		entity.setCreationDate(Util.ParseDateFromString(c.getString(col_createDate)));
+		entity.setUpdateDate(Util.ParseDateFromString(c.getString(col_updateDate)));
+		entity.setData(new JSONObject(c.getString(col_data)));
+		entity.setType(c.getString(col_type));		
+		return entity;
 	}
 
 }

@@ -38,13 +38,17 @@ import org.xml.sax.SAXException;
 import org.codehaus.jackson.JsonProcessingException;
 import org.codehaus.jackson.map.ObjectMapper;
 
+import net.smart_json_database.integration.SmartJsonDatabaseCursor;
 import net.smart_json_database.tools.Util;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.database.Cursor;
+import android.database.MatrixCursor;
+import android.database.sqlite.SQLiteCursorDriver;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.database.sqlite.SQLiteQuery;
 
 public class JSONDatabase {
 
@@ -226,7 +230,7 @@ public class JSONDatabase {
 		}
 		return null;
 	}
-
+	
 	public List<JSONEntity> fetchByTag(String tag)
 	{
 
@@ -239,7 +243,6 @@ public class JSONDatabase {
 		return fetchByFields(search, null);
 	}
 
-
 	public List<JSONEntity> fetchByFields(SearchFields search, Order order)
 	{
 		SQLiteDatabase db = dbHelper.getReadableDatabase();
@@ -247,6 +250,17 @@ public class JSONDatabase {
 
 		result = fetchByRawSQL(db,"SELECT * FROM " + TABLE_JSON_DATA + search.toString(),new String[]{}, order);
 		return result;
+	}
+	
+	public Cursor fetchCursorByFields(SearchFields search)
+	{
+		return fetchCursorByFields(search, null);
+	}
+	
+	public Cursor fetchCursorByFields(SearchFields search, Order order)
+	{
+		SQLiteDatabase db = dbHelper.getReadableDatabase();
+		return fetchCursorByRawSQL(db,"SELECT * FROM " + TABLE_JSON_DATA + search.toString(),new String[]{}, order);
 	}
 
 	public List<JSONEntity> fetchAllEntities()
@@ -260,13 +274,25 @@ public class JSONDatabase {
 		return fetchByType(type, null);
 	}
 
-
 	public List<JSONEntity> fetchByType(String type, Order order) {
 		if(Util.IsNullOrEmpty(type))
 			return new ArrayList<JSONEntity>();
 
 		SQLiteDatabase db = dbHelper.getReadableDatabase();
-		return fetchByRawSQL(db,"SELECT * FROM " + TABLE_JSON_DATA + " WHERE type = '" + type + "'",new String[]{}, order);
+		return fetchByRawSQL(db,"SELECT  * FROM " + TABLE_JSON_DATA + " WHERE type = ?",new String[]{type}, order);
+	}
+	
+	public Cursor fetchCursorByType(String type)
+	{
+		return fetchCursorByType(type, null);
+	}
+
+	public Cursor fetchCursorByType(String type, Order order) {
+		if(Util.IsNullOrEmpty(type))
+			return new MatrixCursor(null);
+
+		SQLiteDatabase db = dbHelper.getReadableDatabase();
+		return fetchCursorByRawSQL(db,"SELECT json_uid as _id, * FROM " + TABLE_JSON_DATA + " WHERE type = ?",new String[]{type}, order);
 	}
 
 	public List<JSONEntity> fetchManyByIds(Collection<Integer> ids)
@@ -530,10 +556,21 @@ public class JSONDatabase {
 		return tags.keySet();
 	}
 
+	private Cursor fetchCursorByRawSQL(SQLiteDatabase db, String sql, String[] params){
+		return fetchCursorByRawSQL(db, sql, params, null);
+	}
+	
+	
+	private Cursor fetchCursorByRawSQL(SQLiteDatabase db, String sql, String[] params, Order order){
+		// TODO send factor
+		//Cursor c = db.rawQueryWithFactory(factory, sql, params, null, null);
+		Cursor c = db.rawQuery(sql, params);
+		return c;
+	}
+	
 	private ArrayList<JSONEntity> fetchByRawSQL(SQLiteDatabase db, String sql, String[] params){
 		return fetchByRawSQL(db, sql, params, null);
 	}
-
 
 	private ArrayList<JSONEntity> fetchByRawSQL(SQLiteDatabase db, String sql, String[] params, Order order)
 	{
@@ -553,20 +590,11 @@ public class JSONDatabase {
 		Cursor c = db.rawQuery(sql, params);
 		if(c.getCount() > 0)
 		{
-			int col_id = c.getColumnIndex("json_uid");
-			int col_createDate = c.getColumnIndex("createDate");
-			int col_updateDate = c.getColumnIndex("updateDate");
-			int col_data = c.getColumnIndex("data");
-			int col_type = c.getColumnIndex("type");
+
 			c.moveToFirst();
 			do{
 				try {
-					JSONEntity entity = new JSONEntity();
-					entity.setUid(c.getInt(col_id));
-					entity.setCreationDate(Util.ParseDateFromString(c.getString(col_createDate)));
-					entity.setUpdateDate(Util.ParseDateFromString(c.getString(col_updateDate)));
-					entity.setData(new JSONObject(c.getString(col_data)));
-					entity.setType(c.getString(col_type));
+					JSONEntity entity = JSONEntity.loadFromCursor(c);
 					getTagsForJSONEntity(entity,db);
 					getHasManyRelationsForJSONEntity(entity,db);
 					getBelongsToRelationsForJSONEntity(entity,db);
